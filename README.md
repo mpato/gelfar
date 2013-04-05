@@ -1,4 +1,4 @@
-StratGame
-=========
+The boredom of Gelfar
+=====================
 
-OpenGL Strategy Game
+   OpenGL RPG Game
