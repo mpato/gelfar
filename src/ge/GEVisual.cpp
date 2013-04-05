@@ -1,6 +1,7 @@
 #include <GL/glut.h>
 #include <GL/glu.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "GEVisual.h"
 
@@ -56,6 +57,9 @@ void GEVisual::draw(vector_t unit_size)
 {
   glPushMatrix();
   glTranslatef(unit_size.x * position.x,
+      unit_size.y * position.y,
+      unit_size.z * position.z);
+  printf("%f %f %f\n", unit_size.x * position.x,
       unit_size.y * position.y,
       unit_size.z * position.z);
   glRotatef(rotation.x, 1, 0, 0);
@@ -200,6 +204,11 @@ void GEComposite::drawVisual(vector_t unit_size)
     this->components[i]->draw(unit_size);
 }
 
+GEVisual* GEComposite::clone()
+{
+  return NULL;
+}
+
 GEMapGrid::GEMapGrid(cell_vector_t dimensions, unit_vector_t cell_size)
 {
   cell_vector_t pos;
@@ -258,8 +267,10 @@ cell_rect_t GEMapGrid::getSelection()
 void GEMapGrid::drawVisual(vector_t unit_size)
 {
   cell_draw_event_data_t ev_data;
+  printf("Drawing map...\n");
   for (int i = 0; i < dimensions.col * dimensions.row; i++) {
-    ev_data.bg_color = COLOR_WHITE;
+    printf("Drawing cell %d...\n", i);
+    ev_data.bg_color = COLOR_RED;
     ev_data.cell = cells[i].map_position;
     ev_data.cell_height = 0;
     ev_data.delete_visual = 0;
@@ -270,7 +281,7 @@ void GEMapGrid::drawVisual(vector_t unit_size)
     cells[i].bg_color = ev_data.bg_color;
     cells[i].height = ev_data.cell_height;
     cells[i].visual = ev_data.visual;
-    cells[i].drawVisual(unit_size);
+    cells[i].draw(unit_size);
     if (ev_data.visual && ev_data.delete_visual)
       delete ev_data.visual;
   }
@@ -287,6 +298,10 @@ void GEMapGrid::touch(int key_event, int down, GEMapCell *cell)
      select(selection);
    }
   }
+}
+GEVisual* GEMapGrid::clone()
+{
+  return NULL;
 }
 
 void cell_touch(int key_event, int down, void *opaque)
@@ -318,28 +333,33 @@ GEMapCell::~GEMapCell()
 void GEMapCell::drawVisual(vector_t unit_size)
 {
   float hx, hy, hz;
-   hx = (this->parent->cell_size.x * unit_size.x) / 2;
-   hy = (this->parent->cell_size.y * unit_size.y) / 2;
-   hz = (this->height * unit_size.z) / 2;
+   hx = (this->parent->cell_size.x * unit_size.x) / 2 - unit_size.x/20;
+   hy = (this->parent->cell_size.y * unit_size.y) / 2 - unit_size.y/20;
+   hz = (this->height * unit_size.z) + 0.01;
    if (visual)
      visual->draw(unit_size);
    glBegin(GL_QUADS);
    glColor3ub(RED(bg_color), GREEN(bg_color), BLUE(bg_color));
-   glVertex3f( hx, hy,-hz);
-   glVertex3f(-hx, hy,-hz);
+   glVertex3f( hx, hy, 0);
+   glVertex3f(-hx, hy, 0);
    glVertex3f(-hx, hy, hz);
    glVertex3f( hx, hy, hz);
    glVertex3f( hx,-hy, hz);
    glVertex3f(-hx,-hy, hz);
-   glVertex3f(-hx,-hy,-hz);
-   glVertex3f( hx,-hy,-hz);
+   glVertex3f(-hx,-hy, 0);
+   glVertex3f( hx,-hy, 0);
    glVertex3f( hx, hy, hz);
    glVertex3f(-hx, hy, hz);
    glVertex3f(-hx,-hy, hz);
    glVertex3f( hx,-hy, hz);
-   glVertex3f( hx,-hy,-hz);
-   glVertex3f(-hx,-hy,-hz);
-   glVertex3f(-hx, hy,-hz);
-   glVertex3f( hx, hy,-hz);
+   glVertex3f( hx,-hy, 0);
+   glVertex3f(-hx,-hy, 0);
+   glVertex3f(-hx, hy, 0);
+   glVertex3f( hx, hy, 0);
    glEnd();
+}
+
+GEVisual* GEMapCell::clone()
+{
+  return NULL;
 }

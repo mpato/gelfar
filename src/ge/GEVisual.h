@@ -4,33 +4,6 @@
 #include "../core/corevisual.h"
 #include "../core/utils/vector.h"
 
-struct rect_t {
-    vector_t start;
-    vector_t end;
-};
-
-typedef int nunits_t;
-struct unit_vector_t {
-    nunits_t x;
-    nunits_t y;
-    nunits_t z;
-};
-
-struct unit_rect_t {
-    unit_vector_t start;
-    unit_vector_t end;
-};
-
-struct cell_vector_t {
-    int col;
-    int row;
-};
-
-struct cell_rect_t {
-    cell_vector_t start;
-    cell_vector_t end;
-};
-
 extern cell_vector_t empty_cell_vector;
 extern cell_rect_t empty_cell_rect;
 
@@ -48,9 +21,9 @@ cell_rect_t cell_point_rect(int x, int y);
 //Colors
 typedef int GEColor;
 #define RGB(r, g, b) ((r << 16) | (g << 8) | b)
-#define RED(c) (c >> 16 && 0xFF)
-#define GREEN(c) (c >> 8 && 0xFF)
-#define BLUE(c) (c && 0xFF)
+#define RED(c) ((c >> 16) & 0xFF)
+#define GREEN(c) ((c >> 8) & 0xFF)
+#define BLUE(c) (c & 0xFF)
 #define COLOR_BLACK (RGB(0x00, 0x00, 0x00))
 #define COLOR_WHITE (RGB(0xFF, 0xFF, 0xFF))
 #define COLOR_RED   (RGB(0xFF, 0x00, 0x00))

@@ -13,6 +13,6 @@ class CoreVisual {
   int getKey();
   virtual void touch(int key_event, int down) = 0;
   virtual ~CoreVisual() {}
-  virtual void draw(vector_t unit_size);
+  virtual void draw(vector_t unit_size) = 0;
 };
 #endif

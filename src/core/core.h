@@ -8,8 +8,8 @@ class Core
 private:
   static UniqueKeyTree tree;
   static int width, height, view_angle;
-  static CoreVisual *visual_root;
 public:
+  static CoreVisual *visual_root;
   static void init(int counter, char **args);
   static int getSelectedId(int x, int y);
   static void select(int x, int y, int key_event, int down);
