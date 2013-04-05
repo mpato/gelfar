@@ -1,0 +1,4 @@
+StratGame
+=========
+
+OpenGL Strategy Game
