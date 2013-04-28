@@ -31,7 +31,7 @@ typedef int GEColor;
 #define COLOR_BLUE  (RGB(0x00, 0x00, 0xFF))
 
 class GEVisual;
-typedef void (*ge_on_touch_f)(int key_event, int down, void *opaque);
+typedef void (*ge_on_touch_f)(GEVisual *sender, int key_event, int type, void *opaque);
 
 class GEVisual : public CoreVisual{
   protected:
@@ -44,7 +44,7 @@ class GEVisual : public CoreVisual{
     ge_on_touch_f onTouch;
     GEVisual();
     virtual ~GEVisual();
-    virtual void touch(int key_event, int down);
+    virtual void touch(int key_event, int type);
     virtual void draw(vector_t unit_size);
     virtual GEVisual *clone()=0;
 };
@@ -97,18 +97,18 @@ class GEComposite : public GEVisualComponent{
 class GEMapCell;
 class GEMapGrid;
 
-struct cell_draw_event_data_t {
+struct cell_draw_data_t {
     GEColor bg_color;
     nunits_t cell_height;
     GEVisualComponent *visual;
     cell_vector_t cell;
-    GEMapGrid *map;
     int delete_visual;
 };
 
-typedef void (*ge_on_celldraw_f) (cell_draw_event_data_t &event_data, void *opaque);
-typedef void (*ge_on_over_f) (cell_vector_t cell, void *opaque);
-typedef void (*ge_on_select_f) (cell_rect_t cell, void *opaque);
+class GEMapGrid;
+typedef void (*ge_on_celldraw_f) (GEMapGrid *map, cell_draw_data_t &event_data, void *opaque);
+typedef void (*ge_on_over_f) (GEMapGrid *map, cell_vector_t cell, void *opaque);
+typedef void (*ge_on_select_f) (GEMapGrid *map, void *opaque);
 
 class GEMapGrid : public GEVisual {
   private:
@@ -116,9 +116,12 @@ class GEMapGrid : public GEVisual {
     cell_vector_t cursor;
     unit_vector_t cell_size;
     cell_vector_t dimensions;
+    cell_vector_t select_dimensions;
     GEMapCell *cells;
   protected:
     virtual void drawVisual(vector_t unit_size);
+    void drawVisual(vector_t unit_size, cell_vector_t draw_area);
+    void drawSelectionGrid(vector_t unit_size);
   public:
     ge_on_over_f onOver;
     ge_on_select_f onSelect;
@@ -126,12 +129,16 @@ class GEMapGrid : public GEVisual {
     GEMapGrid(cell_vector_t dimensions, unit_vector_t cell_size);
     virtual ~GEMapGrid();
     void moveCursorTo(cell_vector_t cell);
-    cell_vector_t getCellUnderCursor();
+    void moveCursorTo(GEMapCell *cell);
+    GEMapCell *getCellUnderCursor();
+    cell_vector_t getCursor();
     void select(cell_rect_t area);
     void selectUnderCursor();
+    void clearSelection();
     cell_rect_t getSelection();
+    int isSelected(cell_vector_t cell);
     virtual GEVisual *clone();
-    void touch(int key_event, int down, GEMapCell *cell);
+    void touch(int key_event, int type, GEMapCell *cell);
     friend class GEMapCell;
 };
 
@@ -148,6 +155,7 @@ class GEMapCell : public GEVisual {
     GEMapCell(cell_vector_t map_position, GEMapGrid *map);
     virtual ~GEMapCell();
     virtual GEVisual *clone();
+    virtual void touch(int key_event, int type);
     friend class GEMapGrid;
 };
 #endif

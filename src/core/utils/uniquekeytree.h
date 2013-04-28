@@ -1,17 +1,22 @@
 #ifndef UNIQUEKEYTREE_H
 #define UNIQUEKEYTREE_H
-#include <stdlib.h>
+#include <stdint.h>
+
+#define MAX_KEY 2147483647
+#define MIN_KEY -MAX_KEY
 
 class UniqueKeyTree {
  private:
   UniqueKeyTree *left, *right, *parent;
   int key;
   void *obj;
-  int count;
-  int add(void *obj, int min, int max);
+  uint32_t count;
+  static UniqueKeyTree * add(UniqueKeyTree *tree, void *obj, int min, int max, int &ret);
+  static uint32_t get_free_keys(UniqueKeyTree *tree, int min, int max);
   UniqueKeyTree(int k, void *o) {
     obj = o;
     key = k;
+    count = 1;
   }
  public:
   UniqueKeyTree() {
@@ -34,7 +39,8 @@ class UniqueKeyTree {
 
   int add(void *obj);
   void *search(int key);
-  int get_count();
+  int remove(int key);
+  uint32_t get_count();
 };
 
 #endif
